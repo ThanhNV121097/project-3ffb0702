@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -14,9 +13,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
-
-//go:embed migrations/*.up.sql
-var migrations embed.FS
 
 func main() {
 	ctx := context.Background()
@@ -77,7 +73,7 @@ func applyMigrations(ctx context.Context, pool *pgxpool.Pool) error {
 		return fmt.Errorf("ensure schema_migrations: %w", err)
 	}
 
-	entries, err := migrations.ReadDir("migrations")
+	entries, err := os.ReadDir("migrations")
 	if err != nil {
 		return fmt.Errorf("read migrations: %w", err)
 	}
@@ -98,7 +94,7 @@ func applyMigrations(ctx context.Context, pool *pgxpool.Pool) error {
 		if exists {
 			continue
 		}
-		sql, err := migrations.ReadFile("migrations/" + name)
+		sql, err := os.ReadFile("migrations/" + name)
 		if err != nil {
 			return fmt.Errorf("read migration %s: %w", name, err)
 		}
