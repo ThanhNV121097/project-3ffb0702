@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Note Board</title>
+  <style>
+    :root{
+      --primary:#2563EB;
+      --primary-dark:#1D4ED8;
+      --bg:#F8FAFC;
+      --surface:#FFFFFF;
+      --text:#0F172A;
+      --muted:#64748B;
+      --line:#E2E8F0;
+      --accent:#10B981;
+      --danger:#DC2626;
+      --warning:#F59E0B;
+      --shadow:0 24px 70px rgba(15,23,42,.10);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.14), transparent 34rem),
+        linear-gradient(180deg,#F8FAFC 0%,#EFF6FF 48%,#F8FAFC 100%);
+      min-height:100vh;
+    }
+    button:focus-visible,a:focus-visible{outline:3px solid rgba(37,99,235,.45);outline-offset:3px}
+    a{color:inherit}
+    .shell{width:min(1120px,calc(100% - 32px));margin:0 auto}
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter:blur(18px);
+      background:rgba(248,250,252,.78);
+      border-bottom:1px solid rgba(226,232,240,.8);
+    }
+    .nav{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.03em;text-decoration:none}
+    .logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg,var(--primary),#60A5FA);display:grid;place-items:center;box-shadow:0 14px 30px rgba(37,99,235,.24)}
+    .logo svg{width:23px;height:23px;color:white}
+    .navlinks{display:flex;gap:8px;align-items:center}
+    .navlinks a,.ghost{
+      border:0;background:transparent;text-decoration:none;color:var(--muted);font-weight:700;padding:10px 13px;border-radius:12px;transition:.18s ease;cursor:pointer;font-size:14px
+    }
+    .navlinks a:hover,.ghost:hover{background:white;color:var(--text);box-shadow:0 8px 20px rgba(15,23,42,.08)}
+    .mobile-toggle{display:none;border:1px solid var(--line);background:white;border-radius:14px;padding:10px;color:var(--text);cursor:pointer}
+    .hero{padding:70px 0 34px;display:grid;grid-template-columns:1.02fr .98fr;gap:42px;align-items:center}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--primary-dark);background:rgba(37,99,235,.09);border:1px solid rgba(37,99,235,.14);padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px}
+    .pulse{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 0 rgba(16,185,129,.45);animation:pulse 1.9s infinite}
+    @keyframes pulse{70%{box-shadow:0 0 0 11px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+    h1{font-size:clamp(42px,7vw,76px);line-height:.95;letter-spacing:-.07em;margin:20px 0 18px}
+    .lead{font-size:clamp(18px,2.4vw,22px);line-height:1.55;color:var(--muted);max-width:620px;margin:0 0 26px}
+    .meta{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{border:1px solid var(--line);background:rgba(255,255,255,.8);padding:9px 12px;border-radius:999px;color:var(--muted);font-weight:700;font-size:13px}
+    .board-frame{background:rgba(255,255,255,.74);border:1px solid rgba(226,232,240,.9);border-radius:32px;padding:14px;box-shadow:var(--shadow);animation:lift .7s ease both}
+    @keyframes lift{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+    .board{background:var(--surface);border:1px solid var(--line);border-radius:24px;overflow:hidden}
+    .board-head{padding:22px 22px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;align-items:start}
+    .board-title{margin:0;font-size:22px;letter-spacing:-.04em}
+    .board-sub{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.45}
+    .status-pill{white-space:nowrap;background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900}
+    .toolbar{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;background:#FBFDFF}
+    .state-btn{border:1px solid var(--line);background:white;border-radius:12px;padding:9px 12px;font-weight:800;color:var(--muted);cursor:pointer;transition:.18s ease}
+    .state-btn:hover{border-color:#BFDBFE;color:var(--primary-dark);transform:translateY(-1px)}
+    .state-btn.active{background:var(--primary);border-color:var(--primary);color:white;box-shadow:0 12px 26px rgba(37,99,235,.20)}
+    .state-region{min-height:430px;padding:20px;background:linear-gradient(180deg,#FFFFFF,#F8FAFC)}
+    .notes{display:grid;gap:14px}
+    .note{position:relative;padding:18px 18px 16px;border:1px solid var(--line);border-radius:18px;background:white;box-shadow:0 12px 30px rgba(15,23,42,.06);animation:itemIn .42s ease both}
+    .note:nth-child(2){animation-delay:.06s}.note:nth-child(3){animation-delay:.12s}.note:nth-child(4){animation-delay:.18s}
+    @keyframes itemIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .note:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;border-radius:18px 0 0 18px;background:var(--primary)}
+    .note h3{margin:0 0 8px;font-size:17px;letter-spacing:-.03em}
+    .note p{margin:0;color:#475569;line-height:1.55}
+    .note-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;color:var(--muted);font-size:12px;font-weight:800}
+    .tag{color:#075985;background:#E0F2FE;border:1px solid #BAE6FD;border-radius:999px;padding:5px 8px}
+    .skeleton{display:grid;gap:14px}
+    .sk-card{border:1px solid var(--line);border-radius:18px;background:white;padding:18px;overflow:hidden;position:relative}
+    .sk-line{height:13px;border-radius:999px;background:#E2E8F0;margin:10px 0}
+    .sk-line.short{width:42%}.sk-line.mid{width:72%}.sk-line.long{width:92%}
+    .shimmer:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);transform:translateX(-100%);animation:shimmer 1.35s infinite}
+    @keyframes shimmer{to{transform:translateX(100%)}}
+    .empty,.error{min-height:360px;display:grid;place-items:center;text-align:center;padding:28px}
+    .state-card{max-width:420px;background:white;border:1px solid var(--line);border-radius:24px;padding:30px;box-shadow:0 18px 46px rgba(15,23,42,.08)}
+    .state-icon{width:58px;height:58px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center}
+    .empty .state-icon{background:#EFF6FF;color:var(--primary)}
+    .error .state-icon{background:#FEF2F2;color:var(--danger)}
+    .state-card h3{margin:0 0 8px;font-size:22px;letter-spacing:-.04em}
+    .state-card p{margin:0;color:var(--muted);line-height:1.55}
+    .retry{margin-top:18px;border:0;background:var(--primary);color:white;border-radius:13px;padding:11px 15px;font-weight:900;cursor:pointer;box-shadow:0 12px 24px rgba(37,99,235,.22);transition:.18s ease}
+    .retry:hover{background:var(--primary-dark);transform:translateY(-1px)}
+    .details{padding:36px 0 74px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .detail{background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 12px 34px rgba(15,23,42,.06)}
+    .detail strong{display:block;margin-bottom:7px;letter-spacing:-.02em}.detail span{color:var(--muted);line-height:1.5;font-size:14px}
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr;padding-top:44px}.details{grid-template-columns:1fr}.board-frame{max-width:680px;margin:0 auto}
+    }
+    @media (max-width:680px){
+      .shell{width:min(100% - 22px,1120px)}.nav{height:64px}.mobile-toggle{display:grid;place-items:center}.navlinks{display:none;position:absolute;left:11px;right:11px;top:70px;background:white;border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:var(--shadow);flex-direction:column;align-items:stretch}.navlinks.open{display:flex}.navlinks a,.ghost{text-align:left}.hero{padding-top:34px}.board-head{flex-direction:column}.status-pill{white-space:normal}.state-region{padding:14px}.toolbar{padding:14px}.note-foot{align-items:flex-start;flex-direction:column}
+    }
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="shell nav" aria-label="Primary navigation">
+      <a class="brand" href="#note-board" aria-label="Note Board home">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M7 4h8l4 4v12H7V4Z" stroke="currentColor" stroke-width="2"/><path d="M15 4v5h5M10 13h7M10 17h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <span>Note Board</span>
+      </a>
+      <button class="mobile-toggle" type="button" aria-expanded="false" aria-controls="navlinks" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="navlinks" id="navlinks">
+        <a href="#note-board">Board</a>
+        <a href="#states">States</a>
+        <button class="ghost" type="button" data-state="loaded">Reload demo</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="shell hero" id="note-board">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>Read-only database notes</span>
+        <h1>Saved notes, shown without clutter.</h1>
+        <p class="lead">Note Board loads notes already stored in database and presents them as calm, readable cards. No create button. No edit mode. No delete action. No search. Just current saved notes.</p>
+        <div class="meta" aria-label="Scope summary">
+          <span class="chip">One screen</span>
+          <span class="chip">Read-only list</span>
+          <span class="chip">Loading, empty, error states</span>
+        </div>
+      </div>
+      <div class="board-frame" id="states">
+        <section class="board" aria-labelledby="board-title">
+          <div class="board-head">
+            <div>
+              <h2 class="board-title" id="board-title">Saved notes</h2>
+              <p class="board-sub" id="board-copy">Loaded from database. Most recent note appears first.</p>
+            </div>
+            <span class="status-pill" id="status-pill">4 notes loaded</span>
+          </div>
+          <div class="toolbar" aria-label="Preview states">
+            <button class="state-btn active" type="button" data-state="loaded">Loaded</button>
+            <button class="state-btn" type="button" data-state="loading">Loading</button>
+            <button class="state-btn" type="button" data-state="empty">Empty</button>
+            <button class="state-btn" type="button" data-state="error">Error</button>
+          </div>
+          <div class="state-region" id="state-region" aria-live="polite"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="shell details" aria-label="Design constraints">
+      <div class="detail"><strong>No writing controls</strong><span>Interface avoids add, edit, delete, auth, and search actions, matching one approved capability.</span></div>
+      <div class="detail"><strong>State-first layout</strong><span>Loading, empty, and error screens use same frame so state changes feel stable and predictable.</span></div>
+      <div class="detail"><strong>Quiet reading rhythm</strong><span>Blue accents, strong spacing, and light motion keep saved notes clear without visual noise.</span></div>
+    </section>
+  </main>
+
+  <script>
+    const notes = [
+      {title:'Project kickoff notes', body:'Confirm read-only board scope. First release only displays notes already saved in database.', date:'Today, 09:42', tag:'Planning'},
+      {title:'Customer quote', body:'"The best note screen is the one that stays out of the way and lets me read quickly."', date:'Yesterday, 16:10', tag:'Research'},
+      {title:'Release checklist', body:'Verify loading indicator, empty database message, and recoverable error message before merge.', date:'Monday, 11:25', tag:'QA'},
+      {title:'Content model reminder', body:'Each note needs title, body, created time, and optional label for display only.', date:'Last week', tag:'Data'}
+    ];
+    const region = document.getElementById('state-region');
+    const statusPill = document.getElementById('status-pill');
+    const copy = document.getElementById('board-copy');
+    const buttons = [...document.querySelectorAll('[data-state]')];
+    const navlinks = document.getElementById('navlinks');
+    const toggle = document.querySelector('.mobile-toggle');
+
+    function icon(kind){
+      const paths = {
+        empty:'<path d="M6 5h12v14H6V5Z" stroke="currentColor" stroke-width="2"/><path d="M9 10h6M9 14h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+        error:'<path d="M12 8v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 17h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><path d="M10.3 4.8 3.6 16.4A2 2 0 0 0 5.3 19h13.4a2 2 0 0 0 1.7-2.6L13.7 4.8a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="2"/>'
+      };
+      return '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">'+paths[kind]+'</svg>';
+    }
+    function setActive(state){
+      buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.state === state));
+    }
+    function renderLoaded(){
+      statusPill.textContent = notes.length + ' notes loaded';
+      statusPill.style.background = '#ECFDF5';
+      statusPill.style.color = '#047857';
+      statusPill.style.borderColor = '#A7F3D0';
+      copy.textContent = 'Loaded from database. Most recent note appears first.';
+      region.innerHTML = '<div class="notes">' + notes.map(note => `
+        <article class="note">
+          <h3>${note.title}</h3>
+          <p>${note.body}</p>
+          <div class="note-foot"><span>${note.date}</span><span class="tag">${note.tag}</span></div>
+        </article>`).join('') + '</div>';
+    }
+    function renderLoading(){
+      statusPill.textContent = 'Loading notes';
+      statusPill.style.background = '#EFF6FF';
+      statusPill.style.color = '#1D4ED8';
+      statusPill.style.borderColor = '#BFDBFE';
+      copy.textContent = 'Fetching saved notes from database.';
+      region.innerHTML = '<div class="skeleton">' + [1,2,3].map(() => '<div class="sk-card shimmer"><div class="sk-line short"></div><div class="sk-line long"></div><div class="sk-line mid"></div></div>').join('') + '</div>';
+      window.clearTimeout(window.demoTimer);
+      window.demoTimer = window.setTimeout(() => showState('loaded'), 1150);
+    }
+    function renderEmpty(){
+      statusPill.textContent = 'No notes found';
+      statusPill.style.background = '#F8FAFC';
+      statusPill.style.color = '#64748B';
+      statusPill.style.borderColor = '#CBD5E1';
+      copy.textContent = 'Database returned zero saved notes.';
+      region.innerHTML = '<div class="empty"><div class="state-card"><div class="state-icon">'+icon('empty')+'</div><h3>No saved notes yet</h3><p>When database has notes, they appear here automatically. This screen stays read-only and offers no create action.</p></div></div>';
+    }
+    function renderError(){
+      statusPill.textContent = 'Could not load';
+      statusPill.style.background = '#FEF2F2';
+      statusPill.style.color = '#B91C1C';
+      statusPill.style.borderColor = '#FECACA';
+      copy.textContent = 'Database request failed. User can retry loading.';
+      region.innerHTML = '<div class="error"><div class="state-card"><div class="state-icon">'+icon('error')+'</div><h3>Notes failed to load</h3><p>Connection problem or service error. Existing notes are not changed.</p><button class="retry" type="button">Try loading again</button></div></div>';
+      region.querySelector('.retry').addEventListener('click', () => showState('loading'));
+    }
+    function showState(state){
+      window.clearTimeout(window.demoTimer);
+      setActive(state);
+      if(state === 'loaded') renderLoaded();
+      if(state === 'loading') renderLoading();
+      if(state === 'empty') renderEmpty();
+      if(state === 'error') renderError();
+    }
+    buttons.forEach(btn => btn.addEventListener('click', () => showState(btn.dataset.state)));
+    toggle.addEventListener('click', () => {
+      const open = navlinks.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+    navlinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => {
+      navlinks.classList.remove('open');
+      toggle.setAttribute('aria-expanded','false');
+      toggle.setAttribute('aria-label','Open menu');
+    }));
+    document.addEventListener('keydown', event => {
+      if(event.key === 'Escape'){
+        navlinks.classList.remove('open');
+        toggle.setAttribute('aria-expanded','false');
+        toggle.setAttribute('aria-label','Open menu');
+      }
+    });
+    showState('loading');
+  </script>
+</body>
+</html>
