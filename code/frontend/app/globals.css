@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #F8FAFC;
+  --color-bg-soft: #EFF6FF;
+  --color-bg-panel: #FBFDFF;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #FFFFFF;
+  --color-border: #E2E8F0;
+  --color-border-muted: #CBD5E1;
+  --color-text: #0F172A;
+  --color-text-muted: #64748B;
+  --color-note-body: #475569;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-primary-soft: #60A5FA;
+  --color-primary-border: #BFDBFE;
+  --color-primary-text: #FFFFFF;
+  --color-success: #10B981;
+  --color-success-bg: #ECFDF5;
+  --color-success-text: #047857;
+  --color-success-border: #A7F3D0;
+  --color-info-bg: #E0F2FE;
+  --color-info-text: #075985;
+  --color-info-border: #BAE6FD;
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF2F2;
+  --color-danger-text: #B91C1C;
+  --color-danger-border: #FECACA;
+  --color-warning: #F59E0B;
+  --color-focus: rgba(37, 99, 235, .45);
+  --space-0: 0;
+  --space-1: 5px;
+  --space-2: 6px;
+  --space-3: 7px;
+  --space-4: 8px;
+  --space-5: 9px;
+  --space-6: 10px;
+  --space-7: 11px;
+  --space-8: 12px;
+  --space-9: 13px;
+  --space-10: 14px;
+  --space-11: 15px;
+  --space-12: 16px;
+  --space-13: 18px;
+  --space-14: 20px;
+  --space-15: 22px;
+  --space-16: 26px;
+  --space-17: 28px;
+  --space-18: 30px;
+  --space-19: 32px;
+  --space-20: 34px;
+  --space-21: 36px;
+  --space-22: 42px;
+  --space-23: 44px;
+  --space-24: 70px;
+  --space-25: 72px;
+  --space-26: 74px;
+  --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-control: 14px;
+  --text-base: 16px;
+  --text-note-title: 17px;
+  --text-lead: clamp(18px, 2.4vw, 22px);
+  --text-xl: 22px;
+  --text-hero: clamp(42px, 7vw, 76px);
+  --radius-xs: 12px;
+  --radius-sm: 13px;
+  --radius-md: 14px;
+  --radius-card: 18px;
+  --radius-section: 22px;
+  --radius-panel: 24px;
+  --radius-frame: 32px;
+  --radius-full: 9999px;
+  --border-width: 1px;
+  --border-accent: 5px;
+  --shadow-hover: 0 8px 20px rgba(15,23,42,.08);
+  --shadow-card: 0 12px 30px rgba(15,23,42,.06);
+  --shadow-detail: 0 12px 34px rgba(15,23,42,.06);
+  --shadow-primary: 0 12px 24px rgba(37,99,235,.22);
+  --shadow-primary-active: 0 12px 26px rgba(37,99,235,.20);
+  --shadow-logo: 0 14px 30px rgba(37,99,235,.24);
+  --shadow-state-card: 0 18px 46px rgba(15,23,42,.08);
+  --shadow-frame: 0 24px 70px rgba(15,23,42,.10);
+  --duration-fast: .18s;
+  --duration-enter: .42s;
+  --duration-panel: .7s;
+  --duration-pulse: 1.9s;
+  --duration-shimmer: 1.35s;
+  --easing: ease;
+}
+
+* { box-sizing: border-box; }
+
+html { min-width: 320px; background: var(--color-bg); }
+
+body {
+  margin: 0;
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.55;
+}
+
+a { color: inherit; }
+
+button, input, textarea, select { font: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.app-shell {
+  min-height: 100vh;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: var(--space-24) 0;
+}
+
+@media (max-width: 679px) {
+  .app-shell {
+    width: min(100% - 22px, 1120px);
+    padding: var(--space-20) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
