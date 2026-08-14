@@ -43,8 +43,9 @@ Behaviour:
 1. When the Visitor opens the page, the system starts loading saved notes.
 2. While loading is in progress, the system shows a loading state instead of an empty page.
 3. When saved notes load successfully and at least one note exists, the system shows them in a read-only list.
-4. Each note displays its saved content and any available display metadata from the stored note record, without exposing editing controls.
-5. The page does not show add, edit, delete, search, filter, sign-in, or sign-out controls.
+4. Each note displays its saved content and only these optional display metadata fields when provided by the read service: created time and updated time.
+5. Timestamp display rule is final: show updated time when present; otherwise show created time when present; otherwise show no timestamp for that note.
+6. The page does not show add, edit, delete, search, filter, sign-in, or sign-out controls.
 
 **Acceptance criteria** — each maps one-to-one onto a test case in `docs/notes/test-cases/display-saved-notes.md`.
 
@@ -66,13 +67,14 @@ Behaviour:
 | Invalid stored data | A returned note lacks optional display metadata | The note still renders using its saved content |
 | Boundary | A note has long saved content | Content remains readable within the card/list layout without horizontal page scroll |
 
-**Data touched** — the fields this function reads and writes, in product terms.
+**Data touched** — fields this function reads, in product terms. This function writes no note data.
 
 | Field | Type | Required | Rule |
 |---|---|---|---|
-| Note ID | identifier | yes | Used only to distinguish notes in the list; not editable by the Visitor |
-| Note content | text | yes | Displayed as saved; read-only on this page |
-| Created or updated display time | datetime | no | Displayed if available; absence must not block note rendering |
+| Note ID | identifier | yes | Read only to distinguish notes in the list; not editable by the Visitor |
+| Note content | text | yes | Read and displayed as saved; read-only on this page |
+| Created time | datetime | no | Read and displayed only when no updated time is provided; absence must not block note rendering |
+| Updated time | datetime | no | Read and displayed when provided; absence must not block note rendering |
 
 ## 5. Design
 
@@ -118,10 +120,7 @@ The design is the source of truth for appearance; this section maps functions on
 - **Depends on:** Notes read service, for returning saved notes to the page.
 - **Assumption:** Saved notes already exist outside this capability. This module does not create, edit, delete, import, or seed notes.
 - **Assumption:** If no ordering is provided by the notes read service, the page displays notes in the order returned.
-
-| Open question | Proposed default | Who decides |
-|---|---|---|
-| Which timestamp exists on saved notes | Display a created or updated time only when the read service provides one | TL |
+- **Decision:** Timestamp display uses updated time first, created time second, and no timestamp when neither field is provided.
 
 ## 9. Traceability
 
